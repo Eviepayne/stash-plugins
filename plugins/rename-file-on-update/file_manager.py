@@ -78,10 +78,18 @@ def apply_format(format_template: str, stash: StashInterface, scene_data, file_d
     formatted_template = format_template
 
     for variable in variables:
+        value = None
+
         if variable in FILE_VARIABLES:
             value = FILE_VARIABLES[variable](stash, file_data)
         elif variable in SCENE_VARIABLES:
-            value = SCENE_VARIABLES[variable](stash, scene_data)
+            try:
+                value = SCENE_VARIABLES[variable](stash, scene_data)
+            except (AttributeError, KeyError, TypeError):
+                log.error(f"Missing scene variable: {variable}")
+                exit()
+        else:
+            continue
 
         if not value:
             continue
