@@ -114,6 +114,14 @@ class StashFile:
             path = pathlib.Path(self.file_data["path"])
             directory_path = path.parent.absolute()
 
+        if not self.config.allow_unsafe_characters:
+            sanitized = re.sub(r"[<>:\"\|?*]", "", str(directory_path))
+            directory_path = pathlib.Path(sanitized)
+
+        if self.config.remove_extra_spaces_from_file_name:
+            sanitized = re.sub(r"\s+", " ", str(directory_path))
+            directory_path = pathlib.Path(sanitized)
+
         return directory_path
     
     def get_new_file_name(self) -> str:
